@@ -85,6 +85,9 @@
             font-size: xx-large;
             margin: auto;
         }
+        .active-choice {
+            background-color: red;
+        }
     </style>
   </head>
   <body>
@@ -130,7 +133,26 @@
 
         const iceCreamList = ["vanilla", "chocolate", "strawberry", "mint chip", "banana", "black cherry"]
 
-        //populateChoiceGrid("ice_cream", iceCreamList);
+        populateChoiceGrid("ice_cream", iceCreamList);
+
+        function getChoicesList() {
+            return document.getElementsByClassName("choice-grid-item");
+        }
+        choicesList = getChoicesList();
+
+        function clearAndMarkChoice(event) {
+            var choicesList = getChoicesList()
+            for (var i=0; i<choicesList.length; i++) {
+                console.log("Removing choice: " + i);
+                choicesList[i].classList.remove("active-choice");
+            }
+            event.currentTarget.classList.add("active-choice");
+        }
+
+        for (var i = 0; i < choicesList.length; i++) {
+            console.log("Adding click listener on element " + i);
+            choicesList[i].addEventListener('click', clearAndMarkChoice, false);
+        }
 
         socket.on('player update', (users) => {
             console.log("New player joined! Count: " + users.length);
