@@ -5,7 +5,7 @@
     <title>choices</title>
     <style>
         * {
-            background-color: turquoise;
+            background-color:aqua;
             font-family: fantasy;
         }
         body {
@@ -21,8 +21,6 @@
             display: grid;
             grid-template-columns: repeat(2, 1fr);
             background-color: transparent;
-            padding-left: 20vw;
-            padding-right: 20vw;
             column-gap: 20vw;
             row-gap: 2vh;
             align-items: center;
@@ -30,8 +28,8 @@
         .player-grid-item {
             background-color: rgba(255, 255, 255, 0.8);
             border: 1px solid rgba(0, 0, 0, 0.8);
-            padding: 20px;
-            font-size: 20px;
+            padding: 2vw;
+            font-size: large;
             text-align: center;
         }
         .choice-grid-container {
@@ -41,7 +39,8 @@
             padding-left: 8vw;
             padding-right: 8vw;
             column-gap: 8vw;
-            row-gap: 8vh;
+            row-gap: 4vh;
+            align-items: center;
         }
         .choice-grid-item {
             background-color: rgba(255, 255, 255, 0.8);
@@ -50,6 +49,8 @@
             font-size: 20px;
             text-align: center;
             margin: auto;
+            font-style: italic;
+            text-wrap: balance;
         }
         .open-slot {
             color: rgb(120, 120, 120)
@@ -70,23 +71,36 @@
             background-color: inherit;
         }
         figure {
+            background-color: transparent;
             align-items: center;
             color: black;
+            text-wrap: nowrap;
         }
         .ready-button {
             width: 60vw;
-            height: 18vh;
-            background-color: rgb(122, 253, 0);
+            height: 15vh;
             margin: auto;
+            margin-top: 5vh;
+            padding-top: 10vh;
             text-align: center;
-            vertical-align: auto;
+            vertical-align: middle;
+            background: repeating-linear-gradient(
+                45deg,
+            #1dd83c,
+            #1dd83c 10px,
+            #4aff56 10px,
+            #4aff56 20px
+            );
+            border:rgb(0, 0, 0);
+            border-width: 4px;
         }
         .ready-button-text {
+            background-color: transparent;
             font-size: xx-large;
-            margin: auto;
         }
         .active-choice {
-            background-color: red;
+            background-color: #b1d37b61;
+            box-shadow: 0px 0px 5vh 2vh #b1d37b61;
         }
     </style>
   </head>
