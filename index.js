@@ -16,13 +16,16 @@ app.get('/', (req, res) => {
 
 io.on('connection', (socket) => {
     console.log('new user connected! userID: ' + socket.id);
-    const playerCount = users.length + 1;
-    users[socket.id] = "player" + playerCount;
+    const playerCount = users.length;
+    users[playerCount] = socket.id;
     console.log(users);
-    io.emit('new player', users)
+    io.emit('player update', users);
     socket.on('disconnect', () => {
         console.log('user disconnected... :(' + socket.id);
-            });
+        users.splice(users.indexOf(socket.id), 1); //remove 1 item at index of id
+        io.emit('player update', users);
+        console.log(users);
+    });
 });
 
 server.listen(3000, () => {

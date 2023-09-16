@@ -99,7 +99,7 @@
     <div class="question-box">Which ice cream flavour is your favourite?</div>
 
     <div class="choice-grid-container">
-        <div class="choice-grid-item open-slot" id="choice1">
+        <div class="choice-grid-item open-slot" id="choice1"> <!-- why open slot ???-->
             <figure>
                 <img src="/choices/ice_cream/vanilla.png">
                 <figcaption>vanilla</figcaption>
@@ -149,24 +149,24 @@
     <script>
         const socket = io();
 
-        socket.on('new player', (socketID) => {
-            console.log("New player: " + socketID);
+        socket.on('player update', (users) => {
+            console.log("New player joined! Count: " + users.length);
                 var p1 = document.getElementById("player1name")
                 var p2 = document.getElementById("player2name")
                 var p3 = document.getElementById("player3name")
                 var p4 = document.getElementById("player4name")
                 var players = [p1, p2, p3, p4]
                 console.log(players)
-                for (var p = 0; p < players.length; p++) {
-                    if (players[p].classList.contains("open-slot")) {
-                        console.log(p);
-                        players[p].innerHTML = socketID;
-                        players[p].classList.remove("open-slot");
-                        players[p].classList.add("taken-slot");
-                        break;
-                    }
-                    else {
-                        //no slots
+                for (var u = 0; u < 4; u++) {
+                    if (u < users.length) { //user exists, slot taken
+                        players[u].innerHTML = users[u];
+                        players[u].classList.add("taken-slot");
+                        players[u].classList.remove("open-slot");
+                    } 
+                    else { //user dne, slot open
+                        players[u].innerHTML = "(open slot)";
+                        players[u].classList.add("open-slot");
+                        players[u].classList.remove("taken-slot");
                     }
                 };
             });
