@@ -6,6 +6,8 @@ const app = express();
 const server = createServer(app);
 const io = new Server(server);
 
+app.use(express.static('static'))
+
 var userNames = {}
 
 app.get('/', (req, res) => {

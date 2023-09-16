@@ -8,16 +8,24 @@
             background-color: turquoise;
             font-family: fantasy;
         }
+        body {
+            background-color: transparent;
+        }
         h1 {
             text-align: center;
         }
         .player-grid-container {
+            scale: 80%;
+            margin-top: -1vh;
+            margin-bottom: -2vh;
             display: grid;
             grid-template-columns: repeat(2, 1fr);
             background-color: transparent;
-            padding-left: 100px;
-            padding-right: 100px;
-            column-gap: 100px;
+            padding-left: 20vw;
+            padding-right: 20vw;
+            column-gap: 20vw;
+            row-gap: 2vh;
+            align-items: center;
         }
         .player-grid-item {
             background-color: rgba(255, 255, 255, 0.8);
@@ -26,11 +34,56 @@
             font-size: 20px;
             text-align: center;
         }
+        .choice-grid-container {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            background-color: transparent;
+            padding-left: 8vw;
+            padding-right: 8vw;
+            column-gap: 8vw;
+            row-gap: 8vh;
+        }
+        .choice-grid-item {
+            background-color: rgba(255, 255, 255, 0.8);
+            border: 1px solid rgba(0, 0, 0, 0.8);
+            padding: 0px;
+            font-size: 20px;
+            text-align: center;
+            margin: auto;
+        }
         .open-slot {
             color: rgb(120, 120, 120)
         }
         .taken-slot {
             color: rgb(0, 0, 0)
+        }
+        .question-box {
+            text-align: center;
+            margin-top: 2rem;
+            margin-bottom: 2rem;
+            font-size: xx-large;
+        }
+        img {
+            object-fit: cover;
+            width: 8vw;
+            height: 8vw;
+            background-color: inherit;
+        }
+        figure {
+            align-items: center;
+            color: black;
+        }
+        .ready-button {
+            width: 60vw;
+            height: 18vh;
+            background-color: rgb(122, 253, 0);
+            margin: auto;
+            text-align: center;
+            vertical-align: auto;
+        }
+        .ready-button-text {
+            font-size: xx-large;
+            margin: auto;
         }
     </style>
   </head>
@@ -42,6 +95,55 @@
         <div class="player-grid-item open-slot" id="player3name">(open slot)</div>
         <div class="player-grid-item open-slot" id="player4name">(open slot)</div>
     </div>
+
+    <div class="question-box">Which ice cream flavour is your favourite?</div>
+
+    <div class="choice-grid-container">
+        <div class="choice-grid-item open-slot" id="choice1">
+            <figure>
+                <img src="/choices/ice_cream/vanilla.png">
+                <figcaption>vanilla</figcaption>
+            </figure>
+        </div>
+        <div class="choice-grid-item open-slot" id="choice1">
+            <figure>
+                <img src="/choices/ice_cream/chocolate.png">
+                <figcaption>chocolate</figcaption>
+            </figure>
+        </div>
+        <div class="choice-grid-item open-slot" id="choice1">
+            <figure>
+                <img src="/choices/ice_cream/strawberry.png">
+                <figcaption>strawberry</figcaption>
+            </figure>
+        </div>
+        <div class="choice-grid-item open-slot" id="choice1">
+            <figure>
+                <img src="/choices/ice_cream/mint_chip.png">
+                <figcaption>mint chip</figcaption>
+            </figure>
+        </div>
+        <div class="choice-grid-item open-slot" id="choice1">
+            <figure>
+                <img src="/choices/ice_cream/banana.png">
+                <figcaption>banana</figcaption>
+            </figure>
+        </div>
+        <div class="choice-grid-item open-slot" id="choice1">
+            <figure>
+                <img src="/choices/ice_cream/blueberry.png">
+                <figcaption>blueberry</figcaption>
+            </figure>
+        </div>
+    </div>
+
+    <div class="ready-button">
+        <div class="ready-button-text">
+            Ready
+        </div>
+    </div>
+
+
   </body>
   <script src="/socket.io/socket.io.js"></script>
     <script>
