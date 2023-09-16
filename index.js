@@ -6,20 +6,17 @@ const app = express();
 const server = createServer(app);
 const io = new Server(server);
 
+var userNames = {}
+
 app.get('/', (req, res) => {
   res.sendFile('./index.html', {root: '.'});
 });
 
 io.on('connection', (socket) => {
-    console.log('new user connected!');
+    console.log('new user connected! userID: ' + socket.id);
+    socket.emit('new player', socket.id);
     socket.on('disconnect', () => {
-        console.log('user disconnected... :(');
-    });
-})
-
-io.on('connection', (socket) => {
-    socket.on('chat message', (msg) => {
-      io.emit('chat message', msg);
+        console.log('user disconnected... :(' + socket.id);
     });
 });
 
