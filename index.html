@@ -98,44 +98,7 @@
 
     <div class="question-box">Which ice cream flavour is your favourite?</div>
 
-    <div class="choice-grid-container">
-        <div class="choice-grid-item open-slot" id="choice1"> <!-- why open slot ???-->
-            <figure>
-                <img src="/choices/ice_cream/vanilla.png">
-                <figcaption>vanilla</figcaption>
-            </figure>
-        </div>
-        <div class="choice-grid-item open-slot" id="choice1">
-            <figure>
-                <img src="/choices/ice_cream/chocolate.png">
-                <figcaption>chocolate</figcaption>
-            </figure>
-        </div>
-        <div class="choice-grid-item open-slot" id="choice1">
-            <figure>
-                <img src="/choices/ice_cream/strawberry.png">
-                <figcaption>strawberry</figcaption>
-            </figure>
-        </div>
-        <div class="choice-grid-item open-slot" id="choice1">
-            <figure>
-                <img src="/choices/ice_cream/mint_chip.png">
-                <figcaption>mint chip</figcaption>
-            </figure>
-        </div>
-        <div class="choice-grid-item open-slot" id="choice1">
-            <figure>
-                <img src="/choices/ice_cream/banana.png">
-                <figcaption>banana</figcaption>
-            </figure>
-        </div>
-        <div class="choice-grid-item open-slot" id="choice1">
-            <figure>
-                <img src="/choices/ice_cream/blueberry.png">
-                <figcaption>blueberry</figcaption>
-            </figure>
-        </div>
-    </div>
+    <div class="choice-grid-container" id="choice-grid"></div>
 
     <div class="ready-button">
         <div class="ready-button-text">
@@ -148,6 +111,26 @@
   <script src="/socket.io/socket.io.js"></script>
     <script>
         const socket = io();
+
+        function generateChoice(choice, name, i) {
+            return "<div class=\"choice-grid-item\" id=\"choice" + i + "\"><figure><img src=\"/choices/" + choice + "/" + name.replace(" ", "_") + ".png\"><figcaption>" + name + "</figcaption></figure></div>";
+        }
+
+        function populateChoiceGrid(choice, itemList) {
+            let choiceGrid = document.getElementById("choice-grid");
+            while (choiceGrid.firstChild) {
+                choiceGrid.removeChild(choiceGrid.firstChild); //remove existing children
+            }
+            for (var i = 0; i<itemList.length; i++) {
+                let currentChoiceStr = generateChoice(choice, itemList[i], i);
+                let currentChoiceNode = document.createRange().createContextualFragment(currentChoiceStr)
+                choiceGrid.appendChild(currentChoiceNode);
+            }
+        }        
+
+        const iceCreamList = ["vanilla", "chocolate", "strawberry", "mint chip", "banana", "black cherry"]
+
+        //populateChoiceGrid("ice_cream", iceCreamList);
 
         socket.on('player update', (users) => {
             console.log("New player joined! Count: " + users.length);
