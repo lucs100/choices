@@ -8,7 +8,7 @@ const io = new Server(server);
 
 app.use(express.static('static'))
 
-var userNames = {}
+var users = []
 
 app.get('/', (req, res) => {
   res.sendFile('./index.html', {root: '.'});
@@ -16,10 +16,13 @@ app.get('/', (req, res) => {
 
 io.on('connection', (socket) => {
     console.log('new user connected! userID: ' + socket.id);
-    socket.emit('new player', socket.id);
+    const playerCount = users.length + 1;
+    users[socket.id] = "player" + playerCount;
+    console.log(users);
+    io.emit('new player', users)
     socket.on('disconnect', () => {
         console.log('user disconnected... :(' + socket.id);
-    });
+            });
 });
 
 server.listen(3000, () => {
