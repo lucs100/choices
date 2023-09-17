@@ -247,27 +247,53 @@
             choicesList[i].addEventListener('click', clearAndMarkChoice, false);
         }
 
+        function rename() {
+            var newName = window.prompt("Enter a username:", me.innerHTML.slice(0, -6));
+            console.log(newName);
+            var pkg = new Object();
+            pkg.id = socket.id;
+            pkg.name = newName;
+            socket.emit("name change", (pkg));
+        }
+
+        var me;
+
         socket.on('player update', (users) => {
             console.log("New player joined! Count: " + users.length);
-                var p1 = document.getElementById("player1name")
-                var p2 = document.getElementById("player2name")
-                var p3 = document.getElementById("player3name")
-                var p4 = document.getElementById("player4name")
-                var players = [p1, p2, p3, p4]
-                console.log(players)
-                for (var u = 0; u < 4; u++) {
-                    if (u < users.length) { //user exists, slot taken
-                        players[u].innerHTML = users[u];
-                        players[u].classList.add("taken-slot");
-                        players[u].classList.remove("open-slot");
-                    } 
-                    else { //user dne, slot open
-                        players[u].innerHTML = "(open slot)";
-                        players[u].classList.add("open-slot");
-                        players[u].classList.remove("taken-slot");
+            var p1 = document.getElementById("player1name")
+            var p2 = document.getElementById("player2name")
+            var p3 = document.getElementById("player3name")
+            var p4 = document.getElementById("player4name")
+            var players = [p1, p2, p3, p4]
+            if (me == null) {
+                meIndex = users.findIndex((element) => element.id == socket.id);
+                me = players[meIndex];
+                me.classList.add("player-me");
+                me.addEventListener("click", rename, false)
+            } //flawed when players below you leave
+            console.log(players)
+            for (var u = 0; u < 4; u++) {
+                if (u < users.length) { //user exists, slot taken
+                    console.log(1);
+                    if (users[u].id == socket.id) {
+                        console.log(2);
+                        players[u].innerHTML = (users[u].name + " (you)");
                     }
-                };
-            });
+                    else {players[u].innerHTML = users[u].name;
+                    console.log(3);}
+                    
+                    console.log(4);
+                    players[u].classList.add("taken-slot");
+                    console.log(5);
+                    players[u].classList.remove("open-slot");
+                } 
+                else { //user dne, slot open
+                    players[u].innerHTML = "(open slot)";
+                    players[u].classList.add("open-slot");
+                    players[u].classList.remove("taken-slot");
+                }
+            };
+        });
         
 
   </script>

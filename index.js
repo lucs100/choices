@@ -17,15 +17,31 @@ app.get('/', (req, res) => {
 io.on('connection', (socket) => {
     console.log('new user connected! userID: ' + socket.id);
     const playerCount = users.length;
-    users[playerCount] = socket.id;
+    var newUser = new Object();
+    newUser.id = socket.id;
+    newUser.name = socket.id;
+    users[playerCount] = newUser;
     console.log(users);
     io.emit('player update', users);
     socket.on('disconnect', () => {
-        console.log('user disconnected... :(' + socket.id);
-        users.splice(users.indexOf(socket.id), 1); //remove 1 item at index of id
+        console.log('user disconnected... :( ' + socket.id);
+        var targetUser = users.find((element) => element.id == socket.id)
+        users.splice(users.indexOf(targetUser), 1); //remove 1 item at index of id
         io.emit('player update', users);
         console.log(users);
     });
+});
+
+io.on('connection', (socket) => {
+  console.log("name change watcher ready");
+  socket.on('name change', (pkg) => {
+    console.log("Name change: " + pkg.id + " changed name to " + pkg.name);
+    var targetIdx = users.findIndex((element) => element.id == pkg.id);
+    users[targetIdx] = pkg;
+    console.log("USERS!");
+    console.log(users);
+    io.emit('player update', users);
+  });
 });
 
 server.listen(3000, () => {
