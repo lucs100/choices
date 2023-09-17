@@ -170,12 +170,23 @@
             display: grid;
             grid-template-columns: repeat(2, 1fr);
             background-color: transparent;
-            column-gap: 10vw;
+            column-gap: 0vw;
             row-gap: 2vh;
             align-items: center;
         }
         .results-grid-nametag {
-            width: 50%;
+            border: 1.5px solid rgba(0, 0, 0, 0.8);
+            padding: 2vw;
+            font-size: large;
+            text-align: center;
+            border-radius: 10px;
+            background: repeating-linear-gradient(
+                45deg,
+                #ccffff,
+                #ccffff 10px,
+                #acffff 10px,
+                #acffff 20px
+                );
         }
         .restart-button {
             margin: auto;
@@ -235,7 +246,7 @@
 
     <div class="results-view view-inactive" id="results-view">
 
-        <div class="results-grid" id="results-grid"></div>
+        <div class="results-grid-container" id="results-grid"></div>
         
         <div class="restart-button" id="restart-button">
             <div class="restart-button-text">
@@ -257,9 +268,11 @@
         const CHOICE_LIST = ["vanilla", "chocolate", "strawberry", "mint chip", "banana", "black cherry"];
 
         function restartGame() {
-            populateChoiceGrid(CHOICE, CHOICE_PROMPT, CHOICE_LIST);
+            document.getElementsByClassName("active-choice")[0].classList.remove("active-choice");
             document.getElementById("results-view").classList.add("view-inactive");
             document.getElementById("selection-view").classList.remove("view-inactive");
+            document.getElementById("ready").classList.remove("ready-button-active");
+            document.getElementById("results-grid").innerHTML = "";
         }
 
         var restartButton = document.getElementById("restart-button");
@@ -418,8 +431,7 @@
             var string = generateChoice(choice, name);
             var ele = document.createRange().createContextualFragment(string);
             console.log(ele);
-            //ele.classList.add("results-grid-item");
-            return ele
+            return ele.cloneNode(deep=true)
         }
 
         function getSenderNametag(senderID) {
@@ -430,8 +442,7 @@
                 var playerNum = usersLast.findIndex((user) => user.id == senderID)+1;
                 var ele = document.getElementById("player"+playerNum+"name");
             }  
-            ele.classList.add("results-grid-nametag");
-            return ele;
+            return ele.cloneNode(deep=true);
         }
 
         socket.on('results', (submissions) => {
@@ -442,12 +453,21 @@
             
             for (var i = 0; i<usersLast.length; i++) {
                 var currentUserSubmission = getSenderSubmission(usersLast[i].id, submissions);
-                var submissionEle = getSenderSubmissionEle(currentUserSubmission.choice, currentUserSubmission.name);
-                var submittor = getSenderNametag(currentUserSubmission.sender);
+
+                var submittorEle = getSenderNametag(currentUserSubmission.sender);
+                var submissionEle = getSenderSubmissionEle(currentUserSubmission.choice, toSpace(currentUserSubmission.name));
+
+                console.log(submittorEle);
+                console.log(submissionEle);
+
+                submittorEle.classList.add("results-grid-nametag");
+                submittorEle.classList.remove("player-grid-item");
+                //submissionEle.classList.add("results-grid-item");
                 
-                resultsGrid.appendChild(submittor.cloneNode(true));
-                resultsGrid.appendChild(submissionEle.cloneNode(true));
+                resultsGrid.appendChild(submittorEle);
+                resultsGrid.appendChild(submissionEle);
                 resultsGrid.childNodes[resultsGrid.childNodes.length-1].classList.add("results-grid-item");
+                resultsGrid.childNodes[resultsGrid.childNodes.length-1].classList.remove("player-grid-item");
                 //can't do this with the partial document fragment until added to dom
             }
         });
