@@ -4,10 +4,13 @@
     <meta name="viewport" content="width=device-width,initial-scale=1.0">
     <title>choices</title>
     <style>
+        @keyframes pulse {
+            0% {transform: scale(0.95);}
+            70% {transform: scale(1);}
+            100% {transform: scale(0.95);}
+        }
         @keyframes barberpole {
-            100% {
-                background-position: 100% 100%;
-            }
+            100% {background-position: 100% 100%;}
         }
         * {
             background-color:rgb(34, 89, 89);
@@ -117,21 +120,34 @@
         }
         .ready-button {
             width: 60vw;
-            height: 15vh;
+            height: 13vh;
             margin: auto;
             margin-top: 5vh;
-            padding-top: 10vh;
+            padding-top: 8vh;
             text-align: center;
             vertical-align: middle;
+            border: 1.5px solid rgb(0, 0, 0);
+            border-radius: 20px;
             background: repeating-linear-gradient(
                 45deg,
+                #4e6051,
+                #4e6051 10px,
+                #39413a 10px,
+                #39413a 20px
+                );
+        }
+        .ready-button-active {
+            background: repeating-linear-gradient(
+            45deg,
                 #1dd83c,
                 #1dd83c 10px,
                 #4aff56 10px,
                 #4aff56 20px
                 );
-            border: 1.5px solid rgb(0, 0, 0);
-            border-radius: 20px;
+            background-size: 200% 200%;
+            animation: barberpole 8s linear infinite reverse;
+            background-color: #1ece44e0;
+            box-shadow: 0px 0px 5vh 1vh #1ece44e0;
         }
         .ready-button-text {
             background-color: transparent;
@@ -152,7 +168,7 @@
 
     <div class="choice-grid-container" id="choice-grid"></div>
 
-    <div class="ready-button">
+    <div class="ready-button" id="ready">
         <div class="ready-button-text">
             Ready
         </div>
@@ -196,6 +212,8 @@
                 choicesList[i].classList.remove("active-choice");
             }
             event.currentTarget.classList.add("active-choice");
+            var readyButton = document.getElementById("ready")
+            readyButton.classList.add("ready-button-active")
         }
 
         //TODO: click on your name to edit it
