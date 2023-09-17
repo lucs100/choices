@@ -170,9 +170,34 @@
             display: grid;
             grid-template-columns: repeat(2, 1fr);
             background-color: transparent;
-            column-gap: 20vw;
+            column-gap: 10vw;
             row-gap: 2vh;
             align-items: center;
+        }
+        .results-grid-nametag {
+            width: 50%;
+        }
+        .restart-button {
+            margin: auto;
+            margin-top: 10vh;
+            align-self: center;
+            border-radius: 20px;
+            border: 1.5px solid rgb(0, 0, 0);
+            height: 10vh;
+            width: 40vw;
+            background: repeating-linear-gradient(
+                45deg,
+                #bd72c4,
+                #bd72c4 10px,
+                #a460aa 10px,
+                #a460aa 20px
+            );
+        }
+        .restart-button-text {
+            background-color: transparent;
+            text-align: center;
+            padding-top: 3.8vh;
+            font-size: larger;
         }
     </style>
   </head>
@@ -192,7 +217,6 @@
 
         <div class="choice-grid-container" id="choice-grid"></div>
 
-
         <div class="ready-button" id="ready">
             <div class="ready-button-text">
                 Ready
@@ -209,13 +233,24 @@
 
     </div>
 
-    <div class="results-view view-inactive" id="results-view">thw results!<!-- TODO: "ok" button that resets view, ready status, submission status--> </div>
+    <div class="results-view view-inactive" id="results-view">
+
+        <div class="results-grid" id="results-grid"></div>
+        
+        <div class="restart-button" id="restart">
+            <div class="restart-button-text">
+                Next Question
+            </div>
+        </div>
+
+    </div>
 
 
   </body>
   <script src="/socket.io/socket.io.js"></script>
     <script>
         const socket = io();
+        var usersLast;
         var me;
         const CHOICE = "ice_cream";
         const CHOICE_PROMPT = "Which ice cream flavour is your favourite?";
@@ -242,7 +277,7 @@
             }
             for (var i = 0; i<itemList.length; i++) {
                 let currentChoiceStr = generateChoice(choice, itemList[i]);
-                let currentChoiceNode = document.createRange().createContextualFragment(currentChoiceStr)
+                let currentChoiceNode = document.createRange().createContextualFragment(currentChoiceStr) //incantation for str -> Element
                 choiceGrid.appendChild(currentChoiceNode);
             }
         }        
@@ -297,7 +332,9 @@
             var readyData = new Object();
             readyData.sender = socket.id;
             readyData.senderName = document.getElementsByClassName("player-me")[0].innerHTML.slice(0, -6) //sigh..
-            readyData.objectID = selection.childNodes[0].id;
+            console.log("package delivery!");
+            console.log(selection.childNodes[0]);
+            readyData.name = selection.id.slice(7);
             readyData.choice = CHOICE;
             return readyData;
         }
@@ -310,7 +347,6 @@
             document.getElementById("waiting-view").classList.remove("view-inactive");
         }
         
-        //TODO FIRST: sharing objects on ready
         //TODO: other users ready indicator?
 
         for (var i = 0; i < choicesList.length; i++) {
@@ -329,6 +365,7 @@
 
         socket.on('player update', (users) => {
             console.log("New player joined! Count: " + users.length);
+            usersLast = users;
             var p1 = document.getElementById("player1name")
             var p2 = document.getElementById("player2name")
             var p3 = document.getElementById("player3name")
@@ -364,11 +401,53 @@
             };
         });      
 
+        function getSenderSubmission(ID, submissions) {
+            return submissions.find((s) => s.sender == ID);
+        }
+
+        function getSenderSubmissionEle(choice, name) {
+            var string = generateChoice(choice, name);
+            var ele = document.createRange().createContextualFragment(string);
+            console.log(ele);
+            //ele.classList.add("results-grid-item");
+            return ele
+        }
+
+        function getSenderNametag(ID) {
+            if (ID == socket.id) {
+                var ele = document.getElementsByClassName("player-me")[0];
+            }
+            else {
+                var playerNum = usersLast.findIndex((user) => user.ID == ID)+1;
+                var ele = document.getElementById("player"+playerNum+"name");
+            }  
+            ele.classList.add("results-grid-nametag");
+            return ele;
+        }
+
         socket.on('results', (submissions) => {
-            document.getElementById("waiting-view").classList.add("view-inactive")
-            document.getElementById("results-view").classList.remove("view-inactive")
+            document.getElementById("waiting-view").classList.add("view-inactive");
+            document.getElementById("results-view").classList.remove("view-inactive");
+            var resultsGrid = document.getElementById("results-grid");
             console.log(submissions);
-            //generate the table...
+            
+            for (var i = 0; i<usersLast.length; i++) {
+                var submission = getSenderSubmission(submissions[i].id, submissions);
+                var submissionEle = getSenderSubmissionEle(submissions[i].choice, submissions[i].name);
+                var submittor = getSenderNametag(submissions[i].id);
+
+                console.log("Element 1: Submission Object");
+                console.log(submission);
+                console.log("Element 2: Submission Element");
+                console.log(submissionEle);
+                console.log("Element 3: Nametag Element");
+                console.log(submittor);
+                
+                resultsGrid.appendChild(submittor.cloneNode(true));
+                resultsGrid.appendChild(submissionEle.cloneNode(true));
+                resultsGrid.childNodes[resultsGrid.childNodes.length-1].classList.add("results-grid-item");
+                //can't do this with the partial document fragment until added to dom
+            }
         });
 
   </script>

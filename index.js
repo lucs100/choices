@@ -48,10 +48,11 @@ io.on('connection', (socket) => {
 io.on('connection', (socket) => {
   socket.on('ready up', (readyData) => {
     console.log(readyData.senderName + " has readied up! (" + (submissions.length+1) + '/' + users.length + ')');
-    if (submissions.push(readyData) == users.length) {
-      io.emit('results', submissions);
+      if (submissions.push(readyData) == users.length) {
+      console.log(submissions);
+      io.emit('results', (submissions));
       console.log("All users ready, releasing results!");
-      submissions = [];
+      submissions = []
     }
   });
 });
