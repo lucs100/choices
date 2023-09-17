@@ -9,6 +9,7 @@ const io = new Server(server);
 app.use(express.static('static'))
 
 var users = []
+var submissions = []
 
 app.get('/', (req, res) => {
   res.sendFile('./index.html', {root: '.'});
@@ -41,6 +42,17 @@ io.on('connection', (socket) => {
     console.log("USERS!");
     console.log(users);
     io.emit('player update', users);
+  });
+});
+
+io.on('connection', (socket) => {
+  socket.on('ready up', (readyData) => {
+    console.log(readyData.senderName + " has readied up! (" + (submissions.length+1) + '/' + users.length + ')');
+    if (submissions.push(readyData) == users.length) {
+      io.emit('results', submissions);
+      console.log("All users ready, releasing results!");
+      submissions = [];
+    }
   });
 });
 

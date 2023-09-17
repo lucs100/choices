@@ -153,52 +153,101 @@
             background-color: transparent;
             font-size: xx-large;
         }
+        .view-inactive {
+            display: none;
+        }
+        .waiting-text {
+            color: whitesmoke;
+            text-align: center;
+            font-size: xx-large;
+            font-style: italic;
+            margin-top: 30vh;
+        }
+        .results-grid-container {
+            scale: 80%;
+            margin-top: -1vh;
+            margin-bottom: -2vh;
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            background-color: transparent;
+            column-gap: 20vw;
+            row-gap: 2vh;
+            align-items: center;
+        }
     </style>
   </head>
   <body>
     <h1>choices</h1>
     <div class="player-grid-container">
+        <!--TODO_LATER: could generate on each connection to expand?-->
         <div class="player-grid-item open-slot" id="player1name">(open slot)</div>
         <div class="player-grid-item open-slot" id="player2name">(open slot)</div>
         <div class="player-grid-item open-slot" id="player3name">(open slot)</div>
         <div class="player-grid-item open-slot" id="player4name">(open slot)</div>
     </div>
 
-    <div class="question-box">Which ice cream flavour is your favourite?</div>
+    <div class="question-box"></div>
 
-    <div class="choice-grid-container" id="choice-grid"></div>
+    <div class="selection-view" id="selection-view">
 
-    <div class="ready-button" id="ready">
-        <div class="ready-button-text">
-            Ready
+        <div class="choice-grid-container" id="choice-grid"></div>
+
+
+        <div class="ready-button" id="ready">
+            <div class="ready-button-text">
+                Ready
+            </div>
         </div>
+
     </div>
+
+    <div class="waiting-view view-inactive" id="waiting-view">
+
+        <div class="my-result-holder" id="my-result-holder"></div>
+
+        <div class="waiting-text">Waiting for other players...</div>
+
+    </div>
+
+    <div class="results-view view-inactive" id="results-view">thw results!<!-- TODO: "ok" button that resets view, ready status, submission status--> </div>
 
 
   </body>
   <script src="/socket.io/socket.io.js"></script>
     <script>
         const socket = io();
+        var me;
+        const CHOICE = "ice_cream";
+        const CHOICE_PROMPT = "Which ice cream flavour is your favourite?";
+        const CHOICE_LIST = ["vanilla", "chocolate", "strawberry", "mint chip", "banana", "black cherry"];
 
-        function generateChoice(choice, name, i) {
-            return "<div class=\"choice-grid-item\" id=\"choice" + i + "\"><figure><img src=\"/choices/" + choice + "/" + name.replace(" ", "_") + ".png\"><figcaption class=\"choice-caption\">" + name + "</figcaption></figure></div>";
+        function toUnderscore(string) {
+            return string.replace(" ", "_");
+        }
+        function toSpace(string) {
+            return string.replace("_", " ");
         }
 
-        function populateChoiceGrid(choice, itemList) {
+        // "choice" = the question
+        function generateChoice(choice, name) {
+            return "<div class=\"choice-grid-item\" id=\"choice-" + toUnderscore(name) + "\"><figure><img src=\"/choices/" + choice + "/" + toUnderscore(name) + ".png\"><figcaption class=\"choice-caption\">" + name + "</figcaption></figure></div>";
+        }
+
+        function populateChoiceGrid(choice, choicePrompt, itemList) {
+            let questionBox = document.getElementsByClassName("question-box")[0];
+            questionBox.innerHTML = choicePrompt;
             let choiceGrid = document.getElementById("choice-grid");
             while (choiceGrid.firstChild) {
                 choiceGrid.removeChild(choiceGrid.firstChild); //remove existing children
             }
             for (var i = 0; i<itemList.length; i++) {
-                let currentChoiceStr = generateChoice(choice, itemList[i], i);
+                let currentChoiceStr = generateChoice(choice, itemList[i]);
                 let currentChoiceNode = document.createRange().createContextualFragment(currentChoiceStr)
                 choiceGrid.appendChild(currentChoiceNode);
             }
         }        
 
-        const iceCreamList = ["vanilla", "chocolate", "strawberry", "mint chip", "banana", "black cherry"]
-
-        populateChoiceGrid("ice_cream", iceCreamList);
+        populateChoiceGrid(CHOICE, CHOICE_PROMPT, CHOICE_LIST);
 
         function getChoicesList() {
             return document.getElementsByClassName("choice-grid-item");
@@ -208,6 +257,7 @@
         function submitChoice() {
             var choice = document.getElementsByClassName("active-choice")[0];
             console.log(choice);
+            readyUp();
         }
 
         function prepReadyButton() {
@@ -237,10 +287,31 @@
             }
         }
 
-        //TODO: click on your name to edit it
-        //TODO: (you) indicator
+        //returns a single element of class choice-grid-item
+        function getSelectedChoice() {
+            return document.getElementsByClassName("active-choice")[0];
+        }
+
+        function packageSubmission() {
+            const selection = getSelectedChoice();
+            var readyData = new Object();
+            readyData.sender = socket.id;
+            readyData.senderName = document.getElementsByClassName("player-me")[0].innerHTML.slice(0, -6) //sigh..
+            readyData.objectID = selection.childNodes[0].id;
+            readyData.choice = CHOICE;
+            return readyData;
+        }
+        
+        function readyUp() {
+            var readyData = packageSubmission();
+            socket.emit('ready up', (readyData));
+            console.log("readied!");
+            document.getElementById("selection-view").classList.add("view-inactive");
+            document.getElementById("waiting-view").classList.remove("view-inactive");
+        }
+        
         //TODO FIRST: sharing objects on ready
-        //TODO: can you send an entire object?
+        //TODO: other users ready indicator?
 
         for (var i = 0; i < choicesList.length; i++) {
             console.log("Adding click listener on element " + i);
@@ -255,8 +326,6 @@
             pkg.name = newName;
             socket.emit("name change", (pkg));
         }
-
-        var me;
 
         socket.on('player update', (users) => {
             console.log("New player joined! Count: " + users.length);
@@ -293,8 +362,14 @@
                     players[u].classList.remove("taken-slot");
                 }
             };
+        });      
+
+        socket.on('results', (submissions) => {
+            document.getElementById("waiting-view").classList.add("view-inactive")
+            document.getElementById("results-view").classList.remove("view-inactive")
+            console.log(submissions);
+            //generate the table...
         });
-        
 
   </script>
 </html>
