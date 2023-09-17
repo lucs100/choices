@@ -205,21 +205,42 @@
         }
         choicesList = getChoicesList();
 
-        function clearAndMarkChoice(event) {
-            var choicesList = getChoicesList()
-            for (var i=0; i<choicesList.length; i++) {
-                console.log("Removing choice: " + i);
-                choicesList[i].classList.remove("active-choice");
-            }
-            event.currentTarget.classList.add("active-choice");
+        function submitChoice() {
+            var choice = document.getElementsByClassName("active-choice")[0];
+            console.log(choice);
+        }
+
+        function prepReadyButton() {
             var readyButton = document.getElementById("ready")
             readyButton.classList.add("ready-button-active")
+            readyButton.addEventListener("click", submitChoice, false);
+        }
+
+        function disableReadyButton() {
+            var readyButton = document.getElementById("ready")
+            readyButton.classList.remove("ready-button-active")
+            readyButton.removeEventListener("click", submitChoice, false);
+        }
+
+        function clearAndMarkChoice(event) {
+            var choicesList = getChoicesList()
+            if (event.currentTarget.classList.contains("active-choice")) {
+                event.currentTarget.classList.remove("active-choice");
+                disableReadyButton();
+            }
+            else {
+                for (var i=0; i<choicesList.length; i++) {
+                    choicesList[i].classList.remove("active-choice");
+                }
+                event.currentTarget.classList.add("active-choice");
+                prepReadyButton();
+            }
         }
 
         //TODO: click on your name to edit it
         //TODO: (you) indicator
         //TODO FIRST: sharing objects on ready
-        //TODO: ready disable/enable
+        //TODO: can you send an entire object?
 
         for (var i = 0; i < choicesList.length; i++) {
             console.log("Adding click listener on element " + i);
